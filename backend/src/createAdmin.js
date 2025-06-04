@@ -8,8 +8,14 @@ async function createAdmin() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB bağlantısı başarılı');
 
-    const adminEmail = 'admin@mathbank.com';
-    const adminPassword = 'admin123';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@mathbank.com';
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    if (!adminPassword) {
+      console.error('HATA: ADMIN_PASSWORD environment değişkeni tanımlanmamış!');
+      console.error('.env dosyanızda ADMIN_PASSWORD tanımlayın.');
+      process.exit(1);
+    }
 
     // Admin var mı kontrol et
     const existingAdmin = await User.findOne({ email: adminEmail });
@@ -31,7 +37,7 @@ async function createAdmin() {
     await admin.save();
     console.log('Admin başarıyla oluşturuldu!');
     console.log('Email:', adminEmail);
-    console.log('Şifre:', adminPassword);
+    console.log('Şifre: .env dosyasında tanımlı');
 
     process.exit(0);
   } catch (error) {
